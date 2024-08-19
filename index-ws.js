@@ -81,6 +81,7 @@ function getCounts() {
     });
 }
 
+// since this example uses memory, the database will reset whenever the server stops
 // everytime we use a database we need to close it by the time the servers are all done
 // we never wanna leave a database connection opened
 function shutdownDB() {

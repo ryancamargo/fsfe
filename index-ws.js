@@ -4,11 +4,17 @@ const app = express();
 
 app.get('/', function(req, res) {
     res.sendFile('index.html', {root: __dirname});
-
 });
 
 server.on('request', app);
 server.listen(3000, function() { console.log('server started on port 3000'); });
+
+// use a process listener to catch the signal interrupt (CTRL+C) to close server and db connection
+process.on('SIGINT', () => {
+    server.close(() => {
+        shutdownDB();
+    });
+});
 
 /* Begin websocket */
 const WebSocketServer = require('ws').Server;
@@ -54,3 +60,18 @@ db.serialize(() => {
     `);
 });
 
+// short hand function so that don't have to repeat SQL queries over and over
+function getCounts() {
+    // to get the output of every single row
+    db.each("SELECT * FROM visitors", (err, row) => {
+        console.log(row);
+    });
+}
+
+// everytime we use a database we need to close it by the time the servers are all done
+// we never wanna leave a database connection opened
+function shutdownDB() {
+    getCounts();
+    console.log("Shutting down db");
+    db.close();
+}

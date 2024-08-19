@@ -37,3 +37,20 @@ wss.broadcast = function broadcast(data) {
         client.send(data);
     });
 }
+
+/* end websockets */
+/* begin database */
+const sqlite = require('sqlite3');
+const db = sqlite.Database(':memory:');   // it will write to memory directly ... to write to a file => './fsfe.db'
+
+// ensure the database is setup before running any queries
+db.serialize(() => { 
+    // using db.run() to write SQL
+    db.run(`
+        CREATE TABLE visitors (
+            count INTEGER,
+            time TEXT
+        )
+    `);
+});
+
